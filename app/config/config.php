@@ -224,7 +224,8 @@ $config['cache_path'] = '';
 | MUST set an encryption key.  See the user guide for info.
 |
 */
-$config['encryption_key'] = '';
+
+$config['encryption_key'] = 'lHcggdAQn9cM1FmVIOQEuNRPlpDXhNF5';
 
 /*
 |--------------------------------------------------------------------------
@@ -247,8 +248,8 @@ $config['encryption_key'] = '';
 $config['sess_cookie_name']		= 'ci_session';
 $config['sess_expiration']		= 7200;
 $config['sess_expire_on_close']	= FALSE;
-$config['sess_encrypt_cookie']	= FALSE;
-$config['sess_use_database']	= FALSE;
+$config['sess_encrypt_cookie']	= TRUE;
+$config['sess_use_database']	= TRUE;
 $config['sess_table_name']		= 'ci_sessions';
 $config['sess_match_ip']		= FALSE;
 $config['sess_match_useragent']	= TRUE;
@@ -279,7 +280,7 @@ $config['cookie_secure']	= FALSE;
 | COOKIE data is encountered
 |
 */
-$config['global_xss_filtering'] = FALSE;
+$config['global_xss_filtering'] = TRUE;
 
 /*
 |--------------------------------------------------------------------------
@@ -293,7 +294,7 @@ $config['global_xss_filtering'] = FALSE;
 | 'csrf_cookie_name' = The cookie name
 | 'csrf_expire' = The number in seconds the token should expire.
 */
-$config['csrf_protection'] = FALSE;
+$config['csrf_protection'] = TRUE;
 $config['csrf_token_name'] = 'csrf_test_name';
 $config['csrf_cookie_name'] = 'csrf_cookie_name';
 $config['csrf_expire'] = 7200;
@@ -356,6 +357,24 @@ $config['rewrite_short_tags'] = FALSE;
 |
 */
 $config['proxy_ips'] = '';
+
+
+//Application Configs
+
+
+//Stripe
+$config['stripe_enabled']	= FALSE;
+$config['stripe_test_mode']	= TRUE;
+$config['stripe_test_key']	= '';
+$config['stripe_live_key']	= '';
+$config['stripe_currency']	= 'usd';
+
+
+//Email
+$config['application_noreply_email'] = "";
+$config['mandrill_username'] = '';
+$config['mandrill_password'] = '';
+
 
 
 /* End of file config.php */

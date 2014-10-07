@@ -3,6 +3,7 @@ class Users_Model extends MY_Model{
 	protected $table = "users";
 
 	function signup($name, $email, $password){
+		$hash = md5(time() + 'rand');
 		$salt = md5(time());
 		$Encryptedpassword = sha1($salt.$password);
 
@@ -12,6 +13,7 @@ class Users_Model extends MY_Model{
 				"email" => $email,
 				"salt" => $salt,
 				"password" => $Encryptedpassword,
+				'activation_hash' => $hash,
 				"created" => time()
 			);
 
@@ -19,6 +21,17 @@ class Users_Model extends MY_Model{
 
 			if($id){
 				$this->session->set_userdata("uid", $id);
+				
+				$reset_template = $this->load->view("email/forgot", array(
+					"hash" => $hash
+				), true);
+
+				$this->email->to($email);
+				$this->email->from($this->config->item('application_noreply_email'));
+				$this->email->subject('Reset Password');
+				$this->email->message($reset_template);
+				$this->email->send();
+
 				redirect(site_url());
 			}
 			else{
