@@ -22,14 +22,14 @@ class Users_Model extends MY_Model{
 			if($id){
 				$this->session->set_userdata("uid", $id);
 				
-				$reset_template = $this->load->view("email/forgot", array(
+				$activate_template = $this->load->view("email/activate", array(
 					"hash" => $hash
 				), true);
 
 				$this->email->to($email);
 				$this->email->from($this->config->item('application_noreply_email'));
-				$this->email->subject('Reset Password');
-				$this->email->message($reset_template);
+				$this->email->subject('Activate Account');
+				$this->email->message($activate_template);
 				$this->email->send();
 
 				redirect(site_url());

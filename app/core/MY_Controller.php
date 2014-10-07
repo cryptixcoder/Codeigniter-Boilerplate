@@ -12,7 +12,15 @@ class MY_Controller extends CI_Controller{
 	function render($view){
 		$this->load->view('embed/header');
 		$this->load->view($view);
+	}
 
+	function _load_partial($name, $data = null){
+		if($data){
+			return $this->load->view('partials/'.$name, $data, true);
+		}
+		else{
+			return $this->load->view('partials/'.$name, null, true);
+		}
 	}
 }
 
@@ -25,7 +33,8 @@ class Ajax extends MY_Controller{
 	}
 
 	function _render_json($data){
-
+		$this->output->set_content_type('application/json');
+		$this->output->set_output(json_encode($data));
 	}
 }
 
@@ -51,7 +60,7 @@ class Admin extends Dashboard{
 	}
 }
 
-class Stripe extends MY_Controller{
+class Payment extends MY_Controller{
 	function __construcT(){
 		parent::__construct();
 
@@ -72,7 +81,7 @@ class Stripe extends MY_Controller{
 		}
 	}
 
-	function _charge_card($card, $amount, $description = null){
+	function _stripe_charge_card($card, $amount, $description = null){
 		$charge = array(
 			"card" => $card,
 			"amount" => $amount * 100,
@@ -93,7 +102,7 @@ class Stripe extends MY_Controller{
 		}
 	}
 
-	function _charge_customer($customer, $amount, $description = null){
+	function _stripe_charge_customer($customer, $amount, $description = null){
 		$charge = array(
 			"custoemr" => $customer,
 			"amount" => $amount * 100,
@@ -114,7 +123,7 @@ class Stripe extends MY_Controller{
 		}
 	}
 
-	function _transfer($recipient, $amount, $description = null){
+	function _stripe_transfer($recipient, $amount, $description = null){
 		$transfer = array();
 
 		$transferObject = Stripe_Transfer::create($transfer);
@@ -134,23 +143,56 @@ class Stripe extends MY_Controller{
 		}
 	}
 
-	function _create_customer($name, $email = null, $card = null, $plan = null){
+	function _stripe_create_customer($name, $email = null, $card = null, $plan = null){
+		$customer = array(
+			"name" => $name
+		);
+
+		if($email){
+			$customer['email'] = $email;
+		}
+
+		if($card){
+			$customer['card'] = $card;
+		}
+
+		if($plan){
+			$customer['plan'] = $plan;
+		}
+
+		$customerObject = Stripe_Customer::create($customer);
+
+		return $customerObject;
+	}
+
+	function _stripe_create_recipient($name = null, $bank = null, $tax_id = null, $type = 'individual'){
+		$recipient = array(
+			"name" => $name,
+			"type" => $type
+		);
+
+		if($bank){
+			$recipient['bank'] = $bank;
+		}
+
+		if($tax_id){
+			$recipient['tax_id'] = $bank;
+		}
+
+		$recipientObject = Stripe_Recipient::create($recipient);
+
+		return $recipientObject;
+	}
+
+	function _stripe_update_customer($customer_id, $name = null, $card = null){
 
 	}
 
-	function _create_recipient($name, $email = null, $bank = null){
+	function _stripe_update_recipient($recipient_id, $name = null, $bank = null, $tax_id = null, $type = 'individual'){
 
 	}
 
-	function _update_customer($customer_id, $name = null, $card = null){
-
-	}
-
-	function _update_recipient($recipient_id, $name = null, $bank = null){
-
-	}
-
-	function _refund_charge(){
+	function _stripe_refund_charge($charge_id, $amount){
 
 	}
 }
