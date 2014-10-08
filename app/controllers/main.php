@@ -51,11 +51,7 @@ class Main extends MY_Controller{
 					"hash" => $hash
 				), true);
 
-				$this->email->to($email);
-				$this->email->from($this->config->item('application_noreply_email'));
-				$this->email->subject('Reset Password');
-				$this->email->message($reset_template);
-				$this->email->send();
+				$this->_send_mail($email, $this->config->item('application_noreply_email'), 'Reset Password', $reset_template);
 			}
 		}
 

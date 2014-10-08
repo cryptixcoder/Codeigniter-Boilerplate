@@ -22,6 +22,14 @@ class MY_Controller extends CI_Controller{
 			return $this->load->view('partials/'.$name, null, true);
 		}
 	}
+
+	function _send_mail($to, $from, $subject, $message){
+		$this->email->to($to);
+		$this->email->from($from);
+		$this->email->subject($subject);
+		$this->email->message($message);
+		$this->email->send();
+	}
 }
 
 class Ajax extends MY_Controller{
@@ -35,6 +43,36 @@ class Ajax extends MY_Controller{
 	function _render_json($data){
 		$this->output->set_content_type('application/json');
 		$this->output->set_output(json_encode($data));
+	}
+
+	function _s3($key){
+		$now = strtotime(date("Y-m-d\TG:i:s")); 
+		$expire = date('Y-m-d\TG:i:s\Z', strtotime('+ 10 minutes', $now)); // credentials valid 10 minutes from now 
+
+
+		$aws_access_key_id = 'yourAccessKeyId'; 
+		$aws_secret_key = 'yourSecretKey'; 
+		$bucket = 'your-bucket'; 
+		$acl = 'public-read'; // if you prefer you can use 'private'  
+		$url = 'https://'.$bucket.'.s3.amazonaws.com'; 
+		$success_action_redirect = 'http://birkoff.net'; 
+		$policy_document='
+		{"expiration": "'.$expire.'",
+		  "conditions": [
+		    {"bucket": "'.$bucket.'"},
+		    ["starts-with", "$key", "'.$key.'"],
+		    {"acl": "'.$acl.'"},
+		    {"success_action_redirect": "'.$success_action_redirect.'"},
+		    ["starts-with", "$Content-Type", ""]
+		  ]
+		}';
+
+		// create policy
+		$policy = base64_encode($policy_document); 
+
+		// create signature
+		// hex2b64 and hmacsha1 are functions that we will create
+		$signature = hex2b64(hmacsha1($aws_secret_key, $policy));
 	}
 }
 
@@ -197,3 +235,34 @@ class Payment extends MY_Controller{
 	}
 }
 
+function hmacsha1($key,$data) 
+  {
+    $blocksize=64;
+    $hashfunc='sha1';
+    if (strlen($key)&gt;$blocksize)
+    $key=pack('H*', $hashfunc($key));
+    $key=str_pad($key,$blocksize,chr(0x00));
+    $ipad=str_repeat(chr(0x36),$blocksize);
+    $opad=str_repeat(chr(0x5c),$blocksize);
+    $hmac = pack(
+                'H*',$hashfunc(
+                    ($key^$opad).pack(
+                        'H*',$hashfunc(
+                            ($key^$ipad).$data
+
+                        )
+                    )
+                )
+            );
+    return bin2hex($hmac);
+  }
+
+  function hex2b64($str)
+  {
+      $raw = '';
+      for ($i=0; $i &lt; strlen($str); $i+=2)
+      {
+          $raw .= chr(hexdec(substr($str, $i, 2)));
+      }
+      return base64_encode($raw);
+  }
