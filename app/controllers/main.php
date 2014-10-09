@@ -98,10 +98,21 @@ class Main extends MY_Controller{
 	}
 
 	function activate($hash = null){
+		if($hash){
+			$user = $this->users_model->find_where(array( "activation_hash" => $hash ), true);
 
+			if($user){
+				$this->users_model->save(array('activated' => 1),$user['id']);
+				$this->session->set_flashdata("success", "Your account has been activated");
+				redirect(site_url('login'));
+			}
+			else{
+				redirect(site_url());
+			}
+		}
 	}
 
 	function notfound(){
-		
+		$this->render('main/notfound');
 	}
 }
