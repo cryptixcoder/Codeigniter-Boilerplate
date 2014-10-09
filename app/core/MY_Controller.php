@@ -73,6 +73,10 @@ class Ajax extends MY_Controller{
 		// create signature
 		// hex2b64 and hmacsha1 are functions that we will create
 		$signature = hex2b64(hmacsha1($aws_secret_key, $policy));
+
+		$this->_render_json(array(
+			"signature" => $
+		));
 	}
 }
 
